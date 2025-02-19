@@ -491,17 +491,11 @@ mklist(char *buf, char *name)
 		if (*cp == '|')
 			n++;
 	}
-	/*
-	 * Allocate an array to put the name pointers into
-	 */
-//	argv = realloc(NULL, n+3, sizeof(char *));
-//	if (argv == NULL)
-//		return(unknown);
 
 	/*
 	 * Fill up the array of pointers to names.
 	 */
-	*argv = NULL;
+	argv = malloc((n+3)*sizeof(char*));
 	argvp = argv+1;
 	n = 0;
 	for (cp = cp2 = buf; (c = *cp);  cp++) {
@@ -771,7 +765,8 @@ suboption(void)
 	if (SB_EOF())
 	    return;
 	if (SB_GET() == TELQUAL_SEND) {
-	    unsigned char temp[50], *dp;
+	    unsigned char temp[50];
+	    char *dp;
 	    int len;
 
 	    if ((dp = env_getvalue("DISPLAY", 0)) == NULL) {

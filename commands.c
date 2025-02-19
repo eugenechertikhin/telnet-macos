@@ -1209,8 +1209,7 @@ bye(int argc, char *argv[])
 	longjmp(toplevel, 1);
 }
 
-void
-quit(void)
+void quit(void)
 {
 	close_connection();
 	Exit(0);
@@ -1220,6 +1219,7 @@ static int
 quitcmd(int unused1, char *unused2[])
 {
 	quit();
+	return 0;
 }
 
 static int
@@ -1733,7 +1733,7 @@ tn(int argc, char *argv[])
 {
     struct addrinfo hints, *res, *res0;
     char *cmd, *hostp = 0, *portp = 0, *user = 0, *aliasp = 0;
-    int error, retry;
+    int error;
     const int niflags = NI_NUMERICHOST, tos = IPTOS_LOWDELAY;
 
     if (connected) {
@@ -1820,17 +1820,15 @@ tn(int argc, char *argv[])
     }
 
     net = -1;
-    retry = 0;
     for (res = res0; res; res = res->ai_next) {
-	if (1 /* retry */) {
-	    char hbuf[NI_MAXHOST];
+	char hbuf[NI_MAXHOST];
 
-	    if (getnameinfo(res->ai_addr, res->ai_addrlen, hbuf, sizeof(hbuf),
-		    NULL, 0, niflags) != 0) {
-		strlcpy(hbuf, "(invalid)", sizeof(hbuf));
-	    }
-	    printf("Trying %s...\r\n", hbuf);
+	if (getnameinfo(res->ai_addr, res->ai_addrlen, hbuf, sizeof(hbuf),
+	    NULL, 0, niflags) != 0) {
+	strlcpy(hbuf, "(invalid)", sizeof(hbuf));
 	}
+	printf("Trying %s...\r\n", hbuf);
+
 	net = socket(res->ai_family, res->ai_socktype, res->ai_protocol);
 	if (net == -1)
 	    continue;
@@ -1884,7 +1882,6 @@ tn(int argc, char *argv[])
 
 	    close(net);
 	    net = -1;
-	    retry++;
 	    continue;
 	}
 
